@@ -1,0 +1,2 @@
+// match pattern and use regex
+db.school.find({name: /Holberton.*/}).forEach(printjson);
