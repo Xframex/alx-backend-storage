@@ -3,7 +3,7 @@
 import redis
 import uuid
 from typing import Callable, Union
-
+from functools import wraps
 
 class Cache:
     def __init__(self):
@@ -28,3 +28,14 @@ class Cache:
 
     def get_int(self, key: str) -> Union[int, None]:
         return self.get(key, fn=lambda d: int(d))
+
+    @staticmethod
+    def count_calls(method: Callable) -> Callable:
+        @wraps(method)
+        def wrapper(self, *args, **kwargs):
+            key = method.__qualname__
+            self._redis.incr(key)
+            return method(self, *args, **kwargs)
+        return wrapper
+
+    store = count_calls(store)
